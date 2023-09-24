@@ -1,7 +1,7 @@
 package main
 
 import (
-	"MachineLearning_1/storage/list"
+	"storage/list"
 	"fmt"
 )
 
