@@ -6,13 +6,13 @@ import (
 )
 
 type Map struct {
-	mp        map[int64]int64
+	mp        map[int64]interface{}
 	nextIndex int64
 }
 
-func NewMap() *Map {
+func (m *Map) NewStorage() interface{} {
 	return &Map{
-		mp:        make(map[int64]int64),
+		mp:        make(map[int64]interface{}),
 		nextIndex: 0,
 	}
 }
@@ -21,7 +21,10 @@ func (m *Map) Len() (l int64) {
 	return int64(len(m.mp))
 }
 
-func (m *Map) Add(value int64) int64 {
+func (m *Map) Add(value interface{}) (id int64) {
+	if m.mp == nil {
+		m.mp = make(map[int64]interface{})
+	}
 	m.mp[m.nextIndex] = value
 	m.nextIndex++
 	return m.nextIndex - 1
@@ -33,7 +36,7 @@ func (m *Map) RemoveByIndex(id int64) {
 }
 
 // RemoveByValue удаляет элемент из map по значению
-func (m *Map) RemoveByValue(value int64) {
+func (m *Map) RemoveByValue(value interface{}) {
 	for k, v := range m.mp {
 		if v == value {
 			delete(m.mp, k)
@@ -43,7 +46,7 @@ func (m *Map) RemoveByValue(value int64) {
 }
 
 // RemoveAllByValue удаляет все элементы из map по значению
-func (m *Map) RemoveAllByValue(value int64) {
+func (m *Map) RemoveAllByValue(value interface{}) {
 	for k, v := range m.mp {
 		if v == value {
 			delete(m.mp, k)
@@ -54,7 +57,7 @@ func (m *Map) RemoveAllByValue(value int64) {
 // GetByIndex возвращает значение элемента по индексу.
 //
 // Если элемента с таким индексом нет, то возвращается 0 и false.
-func (m *Map) GetByIndex(id int64) (int64, bool) {
+func (m *Map) GetByIndex(id int64) (interface{}, bool) {
 	value, ok := m.mp[id]
 	return value, ok
 }
@@ -62,7 +65,7 @@ func (m *Map) GetByIndex(id int64) (int64, bool) {
 // GetByValue возвращает индекс первого найденного элемента по значению.
 //
 // Если элемента с таким значением нет, то возвращается 0 и false.
-func (m *Map) GetByValue(value int64) (int64, bool) {
+func (m *Map) GetByValue(value interface{}) (int64, bool) {
 	for k, v := range m.mp {
 		if v == value {
 			return k, true
@@ -74,7 +77,7 @@ func (m *Map) GetByValue(value int64) (int64, bool) {
 // GetAllByValue возвращает индексы всех найденных элементов по значению
 //
 // Если элементов с таким значением нет, то возвращается nil и false.
-func (m *Map) GetAllByValue(value int64) (ids []int64, ok bool) {
+func (m *Map) GetAllByValue(value interface{}) (ids []int64, ok bool) {
 	for k, v := range m.mp {
 		if v == value {
 			ids = append(ids, k)
@@ -92,7 +95,7 @@ func (m *Map) GetAllByValue(value int64) (ids []int64, ok bool) {
 // GetAll возвращает все элементы списка
 //
 // Если map пуст, то возвращается nil и false.
-func (m *Map) GetAll() (values []int64, ok bool) {
+func (m *Map) GetAll() (values []interface{}, ok bool) {
 	keys := make([]int64, 0, len(m.mp))
 	for k := range m.mp {
 		keys = append(keys, k)
@@ -111,7 +114,7 @@ func (m *Map) GetAll() (values []int64, ok bool) {
 
 // Clear очищает map
 func (m *Map) Clear() {
-	m.mp = make(map[int64]int64)
+	m.mp = make(map[int64]interface{})
 	m.nextIndex = 0
 }
 
