@@ -1,14 +1,20 @@
 package list
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
 
 type List struct {
 	len       int64
 	firstNode *node
 }
 
+var mutex sync.Mutex
+var intCh chan int
+
 // NewList создает новый список
-func NewList() (l *List) {
+func (l *List) NewStorage() interface{} {
 	return &List{len: 0, firstNode: nil}
 }
 
@@ -18,7 +24,7 @@ func (l *List) Len() (len int64) {
 }
 
 // Add добавляет элемент в список и возвращает его индекс
-func (l *List) Add(value int64) (id int64) {
+func (l *List) Add(value interface{}) (id int64) {
 	newNode := &node{value: value}
 	if l.firstNode == nil {
 		l.firstNode = newNode
@@ -62,7 +68,7 @@ func (l *List) RemoveByIndex(id int64) {
 }
 
 // RemoveByValue удаляет элемент из списка по значению
-func (l *List) RemoveByValue(value int64) {
+func (l *List) RemoveByValue(value interface{}) {
 	if l.firstNode == nil {
 		return
 	}
@@ -87,7 +93,7 @@ func (l *List) RemoveByValue(value int64) {
 }
 
 // RemoveAllByValue удаляет все элементы из списка по значению
-func (l *List) RemoveAllByValue(value int64) {
+func (l *List) RemoveAllByValue(value interface{}) {
 	if l.firstNode == nil {
 		return
 	}
@@ -113,7 +119,7 @@ func (l *List) RemoveAllByValue(value int64) {
 // GetByIndex возвращает значение элемента по индексу.
 //
 // Если элемента с таким индексом нет, то возвращается 0 и false.
-func (l *List) GetByIndex(id int64) (value int64, ok bool) {
+func (l *List) GetByIndex(id int64) (value interface{}, ok bool) {
 	for n := l.firstNode; n != nil; n = n.next {
 		if n.index == id {
 			return n.value, true
@@ -125,7 +131,7 @@ func (l *List) GetByIndex(id int64) (value int64, ok bool) {
 // GetByValue возвращает индекс первого найденного элемента по значению.
 //
 // Если элемента с таким значением нет, то возвращается 0 и false.
-func (l *List) GetByValue(value int64) (id int64, ok bool) {
+func (l *List) GetByValue(value interface{}) (id int64, ok bool) {
 	for n := l.firstNode; n != nil; n = n.next {
 		if n.value == value {
 			return n.index, true
@@ -137,7 +143,7 @@ func (l *List) GetByValue(value int64) (id int64, ok bool) {
 // GetAllByValue возвращает индексы всех найденных элементов по значению
 //
 // Если элементов с таким значением нет, то возвращается nil и false.
-func (l *List) GetAllByValue(value int64) (ids []int64, ok bool) {
+func (l *List) GetAllByValue(value interface{}) (ids []int64, ok bool) {
 	var nums []int64
 	for n := l.firstNode; n != nil; n = n.next {
 		if n.value == value {
@@ -153,8 +159,8 @@ func (l *List) GetAllByValue(value int64) (ids []int64, ok bool) {
 // GetAll возвращает все элементы списка
 //
 // Если список пуст, то возвращается nil и false.
-func (l *List) GetAll() (values []int64, ok bool) {
-	var nums []int64
+func (l *List) GetAll() (values []interface{}, ok bool) {
+	var nums []interface{}
 	for n := l.firstNode; n != nil; n = n.next {
 		nums = append(nums, n.value)
 	}
