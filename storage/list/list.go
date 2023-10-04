@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"reflect"
 )
 
 type List struct {
@@ -33,7 +34,7 @@ func (l *List) Add(value interface{}) (id int64) {
 		l.firstNode.index = l.len - 1
 		return l.firstNode.index
 	}
-	if l.firstNode.value != value {
+	if reflect.TypeOf(l.firstNode.value) != reflect.TypeOf(value) {
 		var ErrMismatchType = errors.New("mismatched type: the type of the provided value does not match the type of items already in the storage")
 		fmt.Println(ErrMismatchType)
 		return 0
