@@ -1,6 +1,7 @@
 package list
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 )
@@ -31,6 +32,11 @@ func (l *List) Add(value interface{}) (id int64) {
 		l.len++
 		l.firstNode.index = l.len - 1
 		return l.firstNode.index
+	}
+	if l.firstNode.value != value {
+		var ErrMismatchType = errors.New("mismatched type: the type of the provided value does not match the type of items already in the storage")
+		fmt.Println(ErrMismatchType)
+		return 0
 	}
 	next_node := l.firstNode
 	for ; next_node.next != nil; next_node = next_node.next {
