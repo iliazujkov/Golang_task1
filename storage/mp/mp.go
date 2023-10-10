@@ -3,7 +3,10 @@ package mp
 import (
 	"fmt"
 	"sort"
+	"sync"
 )
+
+var mutexAdd sync.Mutex
 
 type Map struct {
 	mp        map[int64]interface{}
@@ -22,6 +25,8 @@ func (m *Map) Len() (l int64) {
 }
 
 func (m *Map) Add(value interface{}) (id int64) {
+	mutexAdd.Lock()
+	defer mutexAdd.Unlock()
 	if m.mp == nil {
 		m.mp = make(map[int64]interface{})
 	}
@@ -32,11 +37,15 @@ func (m *Map) Add(value interface{}) (id int64) {
 
 // RemoveByIndex удаляет элемент из map по индексу
 func (m *Map) RemoveByIndex(id int64) {
+	mutexAdd.Lock()
+	defer mutexAdd.Unlock()
 	delete(m.mp, id)
 }
 
 // RemoveByValue удаляет элемент из map по значению
 func (m *Map) RemoveByValue(value interface{}) {
+	mutexAdd.Lock()
+	defer mutexAdd.Unlock()
 	for k, v := range m.mp {
 		if v == value {
 			delete(m.mp, k)
@@ -47,6 +56,8 @@ func (m *Map) RemoveByValue(value interface{}) {
 
 // RemoveAllByValue удаляет все элементы из map по значению
 func (m *Map) RemoveAllByValue(value interface{}) {
+	mutexAdd.Lock()
+	defer mutexAdd.Unlock()
 	for k, v := range m.mp {
 		if v == value {
 			delete(m.mp, k)
@@ -58,6 +69,8 @@ func (m *Map) RemoveAllByValue(value interface{}) {
 //
 // Если элемента с таким индексом нет, то возвращается 0 и false.
 func (m *Map) GetByIndex(id int64) (interface{}, bool) {
+	mutexAdd.Lock()
+	defer mutexAdd.Unlock()
 	value, ok := m.mp[id]
 	return value, ok
 }
@@ -66,6 +79,8 @@ func (m *Map) GetByIndex(id int64) (interface{}, bool) {
 //
 // Если элемента с таким значением нет, то возвращается 0 и false.
 func (m *Map) GetByValue(value interface{}) (int64, bool) {
+	mutexAdd.Lock()
+	defer mutexAdd.Unlock()
 	for k, v := range m.mp {
 		if v == value {
 			return k, true
@@ -78,6 +93,8 @@ func (m *Map) GetByValue(value interface{}) (int64, bool) {
 //
 // Если элементов с таким значением нет, то возвращается nil и false.
 func (m *Map) GetAllByValue(value interface{}) (ids []int64, ok bool) {
+	mutexAdd.Lock()
+	defer mutexAdd.Unlock()
 	for k, v := range m.mp {
 		if v == value {
 			ids = append(ids, k)
@@ -96,6 +113,8 @@ func (m *Map) GetAllByValue(value interface{}) (ids []int64, ok bool) {
 //
 // Если map пуст, то возвращается nil и false.
 func (m *Map) GetAll() (values []interface{}, ok bool) {
+	mutexAdd.Lock()
+	defer mutexAdd.Unlock()
 	keys := make([]int64, 0, len(m.mp))
 	for k := range m.mp {
 		keys = append(keys, k)
@@ -120,6 +139,8 @@ func (m *Map) Clear() {
 
 // Print выводит map в консоль
 func (m *Map) Print() {
+	mutexAdd.Lock()
+	defer mutexAdd.Unlock()
 	for k, v := range m.mp {
 		fmt.Println("id: ", k, "value: ", v)
 	}
