@@ -10,9 +10,9 @@ import (
 type List struct {
 	len       int64
 	firstNode *node
+	mutexAdd  sync.RWMutex
 }
 
-var mutexAdd sync.Mutex
 
 // NewList создает новый список
 func (l *List) NewStorage() interface{} {
@@ -26,8 +26,8 @@ func (l *List) Len() (len int64) {
 
 // Add добавляет элемент в список и возвращает его индекс
 func (l *List) Add(value interface{}) (id int64) {
-	mutexAdd.Lock()
 	defer mutexAdd.Unlock()
+	mutexAdd.Lock()
 	newNode := &node{value: value}
 	if l.firstNode == nil {
 		l.firstNode = newNode
@@ -51,8 +51,8 @@ func (l *List) Add(value interface{}) (id int64) {
 
 // RemoveByIndex удаляет элемент из списка по индексу
 func (l *List) RemoveByIndex(id int64) {
-	mutexAdd.Lock()
 	defer mutexAdd.Unlock()
+	mutexAdd.Lock()
 	if l.firstNode == nil {
 		return
 	}
@@ -79,8 +79,8 @@ func (l *List) RemoveByIndex(id int64) {
 
 // RemoveByValue удаляет элемент из списка по значению
 func (l *List) RemoveByValue(value interface{}) {
-	mutexAdd.Lock()
 	defer mutexAdd.Unlock()
+	mutexAdd.Lock()
 	if l.firstNode == nil {
 		return
 	}
@@ -106,8 +106,8 @@ func (l *List) RemoveByValue(value interface{}) {
 
 // RemoveAllByValue удаляет все элементы из списка по значению
 func (l *List) RemoveAllByValue(value interface{}) {
-	mutexAdd.Lock()
 	defer mutexAdd.Unlock()
+	mutexAdd.Lock()
 	if l.firstNode == nil {
 		return
 	}
@@ -134,8 +134,8 @@ func (l *List) RemoveAllByValue(value interface{}) {
 //
 // Если элемента с таким индексом нет, то возвращается 0 и false.
 func (l *List) GetByIndex(id int64) (value interface{}, ok bool) {
-	mutexAdd.Lock()
-	defer mutexAdd.Unlock()
+	defer mutexAdd.RUnlock()
+	mutexAdd.RLock()
 	for n := l.firstNode; n != nil; n = n.next {
 		if n.index == id {
 
@@ -149,8 +149,8 @@ func (l *List) GetByIndex(id int64) (value interface{}, ok bool) {
 //
 // Если элемента с таким значением нет, то возвращается 0 и false.
 func (l *List) GetByValue(value interface{}) (id int64, ok bool) {
-	mutexAdd.Lock()
-	defer mutexAdd.Unlock()
+	defer mutexAdd.RUnlock()
+	mutexAdd.RLock()
 	for n := l.firstNode; n != nil; n = n.next {
 		if n.value == value {
 
@@ -164,8 +164,8 @@ func (l *List) GetByValue(value interface{}) (id int64, ok bool) {
 //
 // Если элементов с таким значением нет, то возвращается nil и false.
 func (l *List) GetAllByValue(value interface{}) (ids []int64, ok bool) {
-	mutexAdd.Lock()
-	defer mutexAdd.Unlock()
+	defer mutexAdd.RUnlock()
+	mutexAdd.RLock()
 	var nums []int64
 	for n := l.firstNode; n != nil; n = n.next {
 		if n.value == value {
@@ -183,8 +183,8 @@ func (l *List) GetAllByValue(value interface{}) (ids []int64, ok bool) {
 //
 // Если список пуст, то возвращается nil и false.
 func (l *List) GetAll() (values []interface{}, ok bool) {
-	mutexAdd.Lock()
-	defer mutexAdd.Unlock()
+	defer mutexAdd.RUnlock()
+	mutexAdd.RLock()
 	var nums []interface{}
 	for n := l.firstNode; n != nil; n = n.next {
 		nums = append(nums, n.value)
