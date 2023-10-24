@@ -101,9 +101,6 @@ func (m *Map) GetAllByValue(value interface{}) (ids []int64, ok bool) {
 		}
 	}
 	if ids != nil {
-		sort.Slice(ids, func(i, j int) bool {
-			return ids[i] < ids[j]
-		})
 		return ids, true
 	}
 	return nil, false
@@ -119,9 +116,6 @@ func (m *Map) GetAll() (values []interface{}, ok bool) {
 	for k := range m.mp {
 		keys = append(keys, k)
 	}
-	sort.Slice(keys, func(i, j int) bool {
-		return keys[i] < keys[j]
-	})
 	for _, k := range keys {
 		values = append(values, m.mp[k])
 	}
